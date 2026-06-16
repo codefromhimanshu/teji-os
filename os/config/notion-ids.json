@@ -1,0 +1,15 @@
+{
+  "_comment": "Filled by os-bootstrap. All agents address Notion objects by these IDs, never by search.",
+  "company_os_page": null,
+  "constitution_page": null,
+  "ai_operating_rules_page": null,
+  "current_strategy_page": null,
+  "ai_activity_log_page": null,
+  "decision_log_db": null,
+  "ideas_db": null,
+  "experiments_db": null,
+  "marketing_library_db": null,
+  "weekly_reviews_db": null,
+  "meeting_notes_page": null,
+  "archive_page": null
+}
