@@ -1,3 +1,7 @@
 os/config/os.env
-os/logs/
+os/logs/*.log
+!os/logs/.gitkeep
 .DS_Store
+os/mirrors/**/*.md
+!os/mirrors/**/.gitkeep
+!os/mirrors/README.md

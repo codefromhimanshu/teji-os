@@ -1,0 +1,1 @@
+Engine output. Markdown reports from cadence runs (daily/midweek/weekly/monthly/quarterly) and from human-invoked skills (idea-review, decision-log, marketing-review, principle-check). Files named `<YYYY-MM-DD>-<cadence-or-skill>[-<slug>].md`. The human reads these; nothing here is automatically synced to Notion.

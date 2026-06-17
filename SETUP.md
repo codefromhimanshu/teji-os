@@ -50,13 +50,17 @@ Creates the Company OS workspace (10 areas, 5 databases, templates, views,
 seeded Constitution/Strategy/Operating Rules) and fills
 `os/config/notion-ids.json`. Idempotent — safe to re-run.
 
-## 6. Register the scheduled agents
+## 6. Register the scheduled cadences
 
-For each agent in `os/config/cadences.md`:
+For each cadence in `os/config/cadences.md`:
 
-1. Headless verification: `claude -p "$(cat os/agents/<name>.md)"` from the
-   repo root — must end in real output or a clean Slack-reported failure.
+1. Headless verification: `claude -p "$(cat os/engine/<runbook>.md)"` from the
+   repo root — must produce a real `os/reports/...` file (or a clean
+   Slack-reported failure if Notion is unreachable). Never writes to Notion.
 2. Ask Claude: "Register the <name> cron job per os/config/cadences.md."
+
+The engine contract: read-only against Notion, outputs to `os/reports/` and
+Slack only. See `os/engine/README.md`.
 
 ## Done when
 

@@ -10,14 +10,16 @@ description: >
 # Principle Check
 
 The founders asked to be checked. Be direct, specific, and constructive. Cite
-principles by number. Refuse to soften findings.
+principles by number. Refuse to soften findings. **You are read-only against
+Notion.** The audit lands as a markdown report; the human applies any
+status changes themselves.
 
 ## Process
 
 1. Read: Constitution (13 principles), Current Strategy, Decision Log (last 30
    days), Ideas DB (recent changes), Experiments DB (active + recently
    closed), latest Weekly Reviews, and `~/infinite/principles/experiment-log.md`
-   if present.
+   if present. All Notion access is read-only (search/fetch).
 2. Answer, with evidence per item:
    - Where are we violating our own principles? (number + instance)
    - Where are we rationalizing instead of using evidence? (claims tagged
@@ -35,13 +37,58 @@ principles by number. Refuse to soften findings.
 
 ## Output
 
-- A findings report: each finding = principle number, instance, evidence,
-  severity (P0 = active violation, P1 = drift, P2 = hygiene), and one concrete
-  fix.
-- Set `Blocked by Principle Check` / Needs Human statuses where warranted.
-- Slack ping with the P0 count. Append to AI Activity Log.
+Write a single markdown file at
+`os/reports/<YYYY-MM-DD>-principle-check.md`:
+
+```
+# Principle Check — <YYYY-MM-DD>
+
+## Recommended Notion Updates
+For each row below, the human applies the property change in Notion.
+- Ideas DB row "<name>": set Status = "Blocked by Principle Check"
+  (reason: P# — <one line>)
+- Ideas DB row "<name>": set Principle Check = "Needs Review"
+- Decision Log row "<title>": set Status = "Under Review"  (or whatever)
+- Experiments DB row "<name>": flag Needs Human  (reason)
+
+(If nothing needs updating, write: "No status changes recommended.")
+
+## What I Checked
+- Constitution (P1–P13)
+- Current Strategy: <pulled date>
+- Decision Log: <N entries, last 30d>
+- Ideas DB: <N changed>
+- Experiments: <N active, N closed>
+- Latest Weekly Review: <date>
+- experiment-log.md: <N entries>
+
+## Findings
+For each finding:
+- **Principle**: P#
+- **Instance**: <one line, link the source row>
+- **Evidence**: <quote / [Data]/[Estimate]/[Assumption] tag>
+- **Severity**: P0 (active violation) | P1 (drift) | P2 (hygiene)
+- **Fix**: <one concrete action>
+
+## Judgment-on-the-table Check
+Consecutive clean kills: <N>.
+If ≥3: recommend written assumptions review. <plain statement>
+
+## Summary
+P0 count: <N>
+P1 count: <N>
+P2 count: <N>
+Top fix: <one line>
+```
+
+- **Slack**: ping via
+  `os/lib/slack_notify.sh "PRINCIPLE CHECK: P0=<N> P1=<N> — see os/reports/<file>"`.
+- **Audit**: append one line to `os/logs/engine.log`:
+  `[ISO timestamp] | principle-check | wrote <report path> | P0=<N> P1=<N>`.
 
 ## Hard rule
 
 If you find nothing, say "no violations found" only after listing what you
 checked. An empty audit with no evidence of looking is worse than no audit.
+Never call any Notion write tool. The report and Slack are the only output
+channels.

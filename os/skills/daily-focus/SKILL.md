@@ -9,7 +9,9 @@ description: >
 
 # Daily Focus
 
-Keep it short. The output is a briefing, not a report.
+Keep it short. The output is a briefing, not a report. **You are read-only
+against Notion.** The full briefing goes to a markdown file; Slack gets only
+the headline.
 
 ## Process
 
@@ -19,7 +21,7 @@ Keep it short. The output is a briefing, not a report.
 2. Read: Current Strategy (Current Focus + Ignoring-for-now), active
    Experiments (windows, success bars, days remaining), Ideas in
    Evaluating/Validating, decisions past Review Date, items in Needs-Human
-   states.
+   states. Read-only access only.
 3. Produce:
    - **Top 3 actions today** — each tied to the active experiment's hypothesis
      or an overdue obligation (verdict due, outcome unfilled). Not busywork.
@@ -32,6 +34,39 @@ Keep it short. The output is a briefing, not a report.
 
 ## Output
 
-- Post the briefing to Slack via `os/lib/slack_notify.sh`.
-- Interactive runs: print it; offer to update Next Action fields in Notion.
-- Append to AI Activity Log (one line).
+Write a single markdown file at `os/reports/<YYYY-MM-DD>-daily.md`:
+
+```
+# Daily Focus — <YYYY-MM-DD>
+
+## Top 3 Actions Today
+1. <action> — tied to: <experiment / overdue obligation>
+2. <action> — tied to: <...>
+3. <action> — tied to: <...>
+
+## Avoid Today
+- <distraction> (Principle 2)
+- <distraction>
+
+## Principle Most At Risk
+P# — <one line why>
+
+## Waiting On Human
+Count: <N>
+Top item: <name + ask>
+
+## Experiments Window Watch
+- <experiment>: <N> days remaining, success bar <metric>, status <one line>
+```
+
+- **Slack**: post the headline only (≤15 lines) via
+  `os/lib/slack_notify.sh`. Headline = top 3 actions + principle-most-at-risk
+  + waiting-on-human count + a "see os/reports/<file>" line.
+- **Audit**: append one line to `os/logs/engine.log`:
+  `[ISO timestamp] | daily-focus | wrote <report path> | top1=<one line>`.
+
+## Hard rules
+
+- Never call any Notion write tool. The markdown report and Slack are the
+  only output channels.
+- Never extend the briefing past one screen of Slack.

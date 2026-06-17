@@ -1,15 +1,41 @@
 {
-  "_comment": "Filled by os-bootstrap. All agents address Notion objects by these IDs, never by search.",
-  "company_os_page": null,
-  "constitution_page": null,
-  "ai_operating_rules_page": null,
-  "current_strategy_page": null,
-  "ai_activity_log_page": null,
-  "decision_log_db": null,
-  "ideas_db": null,
-  "experiments_db": null,
-  "marketing_library_db": null,
-  "weekly_reviews_db": null,
-  "meeting_notes_page": null,
-  "archive_page": null
+  "_comment": "All agents address Notion objects by these IDs, never by search. Updated 2026-06-16 by reconciliation merge.",
+  "_workspace_layout": "Operating System (page) is the root. Our Foundation is the parent category; Company Constitution is a child page under Our Foundation. Reflection holds the Weekly Reviews DB inline.",
+
+  "company_os_page": "37cb9df3-5f95-8103-860b-f1008e254cc2",
+  "foundation_page": "37ab9df3-5f95-8157-9e51-e42746be64e2",
+  "constitution_page": "381b9df3-5f95-81bf-96c1-c569b4830f78",
+  "ai_operating_rules_page": "381b9df3-5f95-8150-b9ef-d4992d3397a3",
+  "current_strategy_page": "381b9df3-5f95-812c-b739-ec0761716e7d",
+  "ai_activity_log_page": "381b9df3-5f95-81ee-bf60-f755ae50e874",
+  "meeting_notes_page": "381b9df3-5f95-8113-9010-cd17c7fcc7e5",
+  "archive_page": "381b9df3-5f95-81ec-b9b9-fdff67ab0f7e",
+  "reflection_page": "37cb9df3-5f95-81ac-a6a5-ff026a8effaf",
+  "needs_attention_page": "37cb9df3-5f95-81cf-a7d3-f6805ed02796",
+
+  "ideas_db": "a3c6efea-ac50-4d10-9ad4-2f24f1574a20",
+  "ideas_data_source": "8eb12110-b6cb-4033-8a0f-fa9f6492c650",
+
+  "experiments_db": "ac44cfe6-b07f-411c-8ce7-ae3fab9456a2",
+  "experiments_data_source": "d2792031-38f1-4112-b4f9-d00df99b00a9",
+  "bets_db": "ac44cfe6-b07f-411c-8ce7-ae3fab9456a2",
+  "bets_data_source": "d2792031-38f1-4112-b4f9-d00df99b00a9",
+
+  "tasks_db": "359f714a-27d7-4f8d-8aa3-76e8fbaad39e",
+  "tasks_data_source": "d7689613-36a2-405f-af6a-318ec7b220d5",
+
+  "daily_log_db": "be7872a3-e6fb-417d-b8e2-55096ac974b8",
+  "daily_log_data_source": "a1bb18d7-a113-4d22-b722-72122b83c36f",
+
+  "decision_log_db": "a5317adf-f6e1-4a38-83e9-9381f2e10ff4",
+  "decision_log_data_source": "d2f51d76-5e68-4d65-bec5-b7ce2d2a20f0",
+
+  "marketing_library_db": "4e017835-56f5-4ae5-8697-78d2e0325161",
+  "marketing_library_data_source": "bdd742cc-bf8e-4279-998a-2b47e70873c8",
+
+  "weekly_reviews_db": "1c1a1023-0d98-4c57-bf74-28a5f8924520",
+  "weekly_reviews_data_source": "244e5c9c-d0f7-4b10-b744-566f9fabbd57",
+
+  "agents_db": "de9197c5-b259-457e-b066-cddcd70bfeea",
+  "agents_data_source": "441e82a3-e4d0-4db8-9588-f0696fabcba6"
 }

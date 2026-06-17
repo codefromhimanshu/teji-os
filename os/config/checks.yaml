@@ -1,0 +1,488 @@
+# Company OS — canonical check list
+#
+# Each check is read-only. The engine queries the named Notion view (or
+# evaluates the computed rule) against a fresh os/mirrors/ snapshot, and
+# if it returns rows / fails the rule, the check fires. The engine
+# reports the fire to os/reports/<date>-<cadence>.md and Slack.
+#
+# Schema (every check has all of these):
+#   id          stable snake_case identifier
+#   title       human-readable name
+#   principle   integer 1..13 from principles/company-constitution.md
+#               (0 if meta/hygiene with no single owning principle)
+#   severity    high | medium | low
+#                 high   = principle violations, data-loss, irreversibility
+#                 medium = hygiene
+#                 low    = nice-to-have
+#   cadence     list — any of: daily, midweek, weekly, monthly, quarterly
+#   source.type notion_view | computed_rule
+#     notion_view fields:
+#       view_page       reflection | needs_attention
+#       view_label      the visible label on that page
+#       view_block_id   the Notion block id (TODO if not yet captured)
+#     computed_rule fields:
+#       rule            one-line predicate; engine evaluates against mirrors
+#   message     one-line statement of what's wrong, principle-aware
+#   action      one-line instruction to the human (what to fix in Notion)
+#
+# Where view_block_id is "TODO" the human will fill it in when the engine
+# first queries Notion and the ID surfaces. Engine never fabricates.
+
+checks:
+
+  # ============================================================
+  # NEEDS ATTENTION — BETS (from Notion "Fix These Bets" page)
+  # ============================================================
+
+  - id: bet_verdict_no_end_date
+    title: "Bet — Verdict set, but no Final End Date"
+    principle: 11
+    severity: medium
+    cadence: [midweek, weekly]
+    source:
+      type: notion_view
+      view_page: needs_attention
+      view_label: "Verdict set, but no Final End Date"
+      view_block_id: TODO
+    message: "Verdict set without Final End Date — can't measure cycle time. Principle 11 (visibility)."
+    action: "Open the bet in Notion, set Final End Date."
+
+  - id: bet_verdict_no_learning
+    title: "Bet — Verdict set, but no learning"
+    principle: 11
+    severity: high
+    cadence: [midweek, weekly]
+    source:
+      type: notion_view
+      view_page: needs_attention
+      view_label: "Verdict set, but no learning"
+      view_block_id: TODO
+    message: "Verdict set without the one learning captured — Principle 11 names learnings as the visibility output."
+    action: "Open the bet in Notion, fill in the learning."
+
+  - id: bet_running_no_window
+    title: "Bet — Running or Closed with no window set"
+    principle: 4
+    severity: high
+    cadence: [daily, midweek, weekly]
+    source:
+      type: notion_view
+      view_page: needs_attention
+      view_label: "Running or Closed, but no window set"
+      view_block_id: TODO
+    message: "Bet is Running/Closed with no Window set — Principle 4 requires the bar pre-registered before launch."
+    action: "Open the bet in Notion, set Window."
+
+  - id: bet_no_status
+    title: "Bet — No Status"
+    principle: 11
+    severity: medium
+    cadence: [daily, midweek, weekly]
+    source:
+      type: notion_view
+      view_page: needs_attention
+      view_label: "Bets with No Status"
+      view_block_id: TODO
+    message: "Bet has no Status — Principle 11, statuses must be current."
+    action: "Open the bet in Notion, set a Status."
+
+  # ============================================================
+  # NEEDS ATTENTION — TASKS (from Notion "Fix These Tasks" page)
+  # ============================================================
+
+  - id: task_done_no_consumed_sp
+    title: "Task — Done or Blocked but no Consumed SP logged"
+    principle: 11
+    severity: medium
+    cadence: [daily, midweek, weekly]
+    source:
+      type: notion_view
+      view_page: needs_attention
+      view_label: "Done or Blocked but no Consumed SP logged"
+      view_block_id: TODO
+    message: "Task Done/Blocked without Consumed SP — Principle 11, record what it actually took."
+    action: "Open the task in Notion, log Consumed SP."
+
+  - id: task_started_no_started_date
+    title: "Task — Started but no Started date"
+    principle: 11
+    severity: medium
+    cadence: [daily, midweek, weekly]
+    source:
+      type: notion_view
+      view_page: needs_attention
+      view_label: "Task Started, but no Started date"
+      view_block_id: TODO
+    message: "Task is Started but Started date is empty — Principle 11."
+    action: "Open the task in Notion, set Started date."
+
+  - id: task_no_committed_sp
+    title: "Task — No Committed SP"
+    principle: 11
+    severity: medium
+    cadence: [daily, midweek, weekly]
+    source:
+      type: notion_view
+      view_page: needs_attention
+      view_label: "No Committed SP"
+      view_block_id: TODO
+    message: "Task has no Committed SP — Principle 11, the work isn't sized."
+    action: "Open the task in Notion, set Committed SP."
+
+  - id: task_blocked_no_reason
+    title: "Task — Blocked, but no reason given"
+    principle: 11
+    severity: medium
+    cadence: [daily, midweek, weekly]
+    source:
+      type: notion_view
+      view_page: needs_attention
+      view_label: "Blocked, but no reason given"
+      view_block_id: TODO
+    message: "Task is Blocked with no reason — Principle 11, the block must be visible."
+    action: "Open the task in Notion, fill in the block reason."
+
+  - id: task_no_status
+    title: "Task — No Status"
+    principle: 11
+    severity: medium
+    cadence: [daily, midweek, weekly]
+    source:
+      type: notion_view
+      view_page: needs_attention
+      view_label: "No Status Tasks: Need Status"
+      view_block_id: TODO
+    message: "Task has no Status — Principle 11."
+    action: "Open the task in Notion, set a Status."
+
+  # ============================================================
+  # NEEDS ATTENTION — ONGOING / SHAPING
+  # ============================================================
+
+  - id: shaping_bets_overflow
+    title: "Shaping — more than 2 bets in Shaping"
+    principle: 2
+    severity: high
+    cadence: [midweek, weekly]
+    source:
+      type: computed_rule
+      rule: "count(bets where status == 'Shaping') > 2"
+    message: "More than 2 bets in Shaping at once — Principle 2 (one bet at a time). Park or decide."
+    action: "Open Bets in Notion, park or kill the excess Shaping bets."
+
+  # ============================================================
+  # REFLECTION — ARE WE EXPERIMENTING FAST?
+  # ============================================================
+
+  - id: live_bet_window_days_left
+    title: "Live bet — days left in window (negative = overdue)"
+    principle: 4
+    severity: high
+    cadence: [daily, midweek, weekly]
+    source:
+      type: notion_view
+      view_page: reflection
+      view_label: "Live bet — on track? days left in the window (negative = overdue)"
+      view_block_id: TODO
+    message: "Live bet is past its window with no verdict — Principle 4, the line does not move; ambiguous is a kill."
+    action: "Open the bet in Notion, call the verdict (continue / kill / blocked)."
+
+  - id: closed_bet_intended_vs_actual_time
+    title: "Closed bet — intended vs actual time"
+    principle: 11
+    severity: low
+    cadence: [weekly, monthly]
+    source:
+      type: notion_view
+      view_page: reflection
+      view_label: "Speed & planning — per closed bet: intended vs actual time"
+      view_block_id: TODO
+    message: "Closed bet without intended-vs-actual time recorded — visibility on speed (Principle 11)."
+    action: "Open the bet in Notion, log intended vs actual time."
+
+  - id: estimate_trend_over_by
+    title: "Estimate trend — 'over by' over time"
+    principle: 11
+    severity: low
+    cadence: [weekly, monthly]
+    source:
+      type: notion_view
+      view_page: reflection
+      view_label: "Estimate trend — 'over by' over time"
+      view_block_id: TODO
+    message: "Estimate trend visibility check — track whether 'over by' is growing."
+    action: "Review the trend in Notion; if growing, flag it in the Weekly Review."
+
+  # ============================================================
+  # REFLECTION — ARE WE LEARNING?
+  # ============================================================
+
+  - id: closed_bet_no_learning
+    title: "Closed bet — no learning captured"
+    principle: 11
+    severity: high
+    cadence: [weekly, monthly]
+    source:
+      type: notion_view
+      view_page: reflection
+      view_label: "Closed bets — do we have learnings? (Closed + Learning empty)"
+      view_block_id: TODO
+    message: "Closed bet without the one learning captured — Principle 11. A clean kill needs the learning to be the machine working."
+    action: "Open the bet in Notion, fill in the learning."
+
+  # ============================================================
+  # REFLECTION — ARE WE OUT THERE?
+  # ============================================================
+
+  - id: posting_cadence_below_13
+    title: "Posting cadence below 13/week"
+    principle: 11
+    severity: medium
+    cadence: [weekly]
+    source:
+      type: computed_rule
+      rule: "daily_log.posts_this_week >= 13"
+    message: "Posting cadence below 13 this week — the main idea is showing the work in the open; cadence is the metric."
+    action: "Open Daily Log in Notion; raise cadence next week or write down why we're not."
+
+  - id: noteworthy_moments_logged
+    title: "Noteworthy moments — logged this week?"
+    principle: 11
+    severity: low
+    cadence: [weekly]
+    source:
+      type: notion_view
+      view_page: reflection
+      view_label: "Noteworthy moments"
+      view_block_id: TODO
+    message: "Visibility check: were noteworthy moments captured this week?"
+    action: "Open Daily Log in Notion; capture anything missing."
+
+  # ============================================================
+  # REFLECTION — META
+  # ============================================================
+
+  - id: weekly_review_draft_present
+    title: "Weekly Review — draft produced this Friday"
+    principle: 10
+    severity: high
+    cadence: [weekly]
+    source:
+      type: computed_rule
+      rule: "exists os/reports/<this-friday>-weekly-review.md with all 11 sections"
+    message: "Weekly Review draft missing — Principle 10 (discipline over motivation); the cadence runs whether or not it feels good."
+    action: "Re-run the weekly cadence; produce the draft."
+
+  - id: constitutional_drift_violations_by_principle
+    title: "Constitutional drift — violations counted by principle this week"
+    principle: 0
+    severity: medium
+    cadence: [weekly]
+    source:
+      type: computed_rule
+      rule: "for each of 13 principles, count violations this week; report counts"
+    message: "Weekly violation counts by principle (Enforcement Level 4)."
+    action: "Read the Weekly Review draft and address the top-violated principle."
+
+  # ============================================================
+  # DAILY-FOCUS (skill-driven)
+  # ============================================================
+
+  - id: principle_most_at_risk_today
+    title: "Principle most at risk today"
+    principle: 0
+    severity: medium
+    cadence: [daily]
+    source:
+      type: computed_rule
+      rule: "daily-focus skill output: principle number + one-line reason"
+    message: "Daily-focus output — principle most at risk today by number."
+    action: "Read the daily report; if the risk is concrete, fix the cause in Notion today."
+
+  - id: experiment_window_closing_2d
+    title: "Active experiment window closes within 2 days"
+    principle: 4
+    severity: high
+    cadence: [daily]
+    source:
+      type: computed_rule
+      rule: "any(experiment.status == 'Running' and experiment.end_date - today <= 2 days)"
+    message: "Active experiment ends within 2 days — Principle 4; verdict prep beats new work."
+    action: "Open the experiment in Notion; prepare the verdict against the pre-registered bar."
+
+  # ============================================================
+  # MIDWEEK (from os/agents/midweek-check.md)
+  # ============================================================
+
+  - id: experiments_past_window
+    title: "Experiments past window (Verdict empty)"
+    principle: 4
+    severity: high
+    cadence: [midweek, weekly]
+    source:
+      type: computed_rule
+      rule: "any(experiment.end_date < today and experiment.verdict is empty)"
+    message: "Experiment past End Date with no Verdict — Principle 4/5; ambiguous is a kill."
+    action: "Open the experiment in Notion, call the verdict. Run the principles 'verdict' skill if useful."
+
+  - id: decisions_past_review_date
+    title: "Decisions past Review Date with Outcome Unknown"
+    principle: 8
+    severity: high
+    cadence: [midweek, weekly]
+    source:
+      type: computed_rule
+      rule: "any(decision.review_date < today and decision.outcome in ['Unknown', empty])"
+    message: "Decision past Review Date, Outcome still Unknown — Enforcement Level 5."
+    action: "Open the decision in Notion: continue / reverse / update."
+
+  - id: ideas_stuck_evaluating
+    title: "Ideas stuck >7 days in Evaluating or Blocked-by-Principle-Check"
+    principle: 5
+    severity: medium
+    cadence: [midweek, weekly]
+    source:
+      type: computed_rule
+      rule: "any(idea.status in ['Evaluating','Blocked by Principle Check'] and now - idea.status_changed_at > 7 days)"
+    message: "Ideas stuck in Evaluating/Blocked-by-Principle-Check >7 days — park or decide (Principle 5)."
+    action: "Open Ideas in Notion; park or decide each stuck row."
+
+  - id: experiment_no_update_7d
+    title: "Active experiment with no status update in 7 days"
+    principle: 11
+    severity: high
+    cadence: [midweek, weekly]
+    source:
+      type: computed_rule
+      rule: "any(experiment.status == 'Running' and now - experiment.last_updated > 7 days)"
+    message: "Active experiment with no status update in 7 days — Principle 11 (visibility)."
+    action: "Open the experiment in Notion, post a status update."
+
+  # ============================================================
+  # MONTHLY (from os/agents/monthly-audit.md)
+  # ============================================================
+
+  - id: strategy_review_overdue
+    title: "Current Strategy review date passed"
+    principle: 8
+    severity: high
+    cadence: [monthly, quarterly]
+    source:
+      type: computed_rule
+      rule: "current_strategy.review_date < today"
+    message: "Current Strategy is past its review date — re-affirm or revise (Principle 8)."
+    action: "Open Current Strategy in Notion; re-affirm with a new review date or revise per the amendment process."
+
+  - id: active_experiment_off_focus
+    title: "Active experiment not consistent with Current Focus"
+    principle: 2
+    severity: high
+    cadence: [monthly]
+    source:
+      type: computed_rule
+      rule: "any(experiment.status == 'Running' and experiment not aligned with Current Strategy 'Current Focus')"
+    message: "Active experiment drifting off Current Focus — Principle 2 (one bet at a time)."
+    action: "Open the experiment in Notion; align with Current Focus or stop it."
+
+  - id: killed_idea_pattern
+    title: "Recurring kill reasons (≥3 with same reason)"
+    principle: 0
+    severity: high
+    cadence: [monthly, quarterly]
+    source:
+      type: computed_rule
+      rule: "count(killed_ideas grouped by reason where count >= 3)"
+    message: "≥3 ideas killed for the same reason — pattern. Same channel? Same segment? Same assumption?"
+    action: "Open the Monthly Audit report; surface the pattern in the next Weekly Review."
+
+  - id: reach_failure_count
+    title: "Reach failures vs product failures"
+    principle: 6
+    severity: high
+    cadence: [monthly, quarterly]
+    source:
+      type: computed_rule
+      rule: "count(experiments where verdict=='kill' and failure_type=='reach') and ratio to product failures"
+    message: "Reach failures counted — the Constitution separates reach vs product failure; reach failure sank the company last time (Principle 6)."
+    action: "Open the Monthly Audit; if reach failures dominate, channel sanity is the next focus."
+
+  - id: idea_no_status
+    title: "Ideas without status"
+    principle: 11
+    severity: medium
+    cadence: [monthly]
+    source:
+      type: computed_rule
+      rule: "any(idea.status is empty)"
+    message: "Ideas without status — Principle 11."
+    action: "Open Ideas in Notion; set status."
+
+  - id: experiment_no_stop_rule
+    title: "Experiment without stop rule"
+    principle: 4
+    severity: high
+    cadence: [monthly]
+    source:
+      type: computed_rule
+      rule: "any(experiment.stop_rule is empty)"
+    message: "Experiment without a stop rule — Principle 4, the bar is pre-registered."
+    action: "Open the experiment in Notion; write the stop rule before it runs further."
+
+  - id: decision_no_review_date
+    title: "Decision without review date"
+    principle: 8
+    severity: medium
+    cadence: [monthly]
+    source:
+      type: computed_rule
+      rule: "any(decision.review_date is empty)"
+    message: "Decision without a Review Date — Principle 8, decisions are checked."
+    action: "Open the decision in Notion; set a Review Date."
+
+  # ============================================================
+  # QUARTERLY (from os/agents/quarterly-audit.md)
+  # ============================================================
+
+  - id: principle_never_invoked
+    title: "Principle never invoked this quarter"
+    principle: 0
+    severity: high
+    cadence: [quarterly]
+    source:
+      type: computed_rule
+      rule: "for each principle 1..13: count decisions citing it this quarter; flag any with count == 0"
+    message: "A principle never invoked this quarter is either being silently followed or silently ignored — say which."
+    action: "Read the Quarterly Audit; surface the never-invoked principles in the next Weekly Review."
+
+  - id: violation_trend_top_principle
+    title: "Principle most violated this quarter"
+    principle: 0
+    severity: high
+    cadence: [quarterly]
+    source:
+      type: computed_rule
+      rule: "aggregate weekly violation counts across the quarter; report top principle and trend"
+    message: "Violation trend — top-violated principle this quarter. Is enforcement working or being routed around?"
+    action: "Read the Quarterly Audit; decide whether to amend the operating rule or tighten enforcement."
+
+  - id: operating_rule_friction
+    title: "Operating rules causing repeated friction"
+    principle: 0
+    severity: high
+    cadence: [quarterly]
+    source:
+      type: computed_rule
+      rule: "identify operating rules cited in misses/violations >= 3 times this quarter"
+    message: "Operating rule(s) repeatedly causing friction — Constitution's amendment process applies."
+    action: "Read the draft amendment proposal in the report; founder decides; change is logged."
+
+  - id: judgment_on_table
+    title: "Judgment on the table — ≥3 consecutive clean kills"
+    principle: 0
+    severity: high
+    cadence: [quarterly]
+    source:
+      type: computed_rule
+      rule: "consecutive_clean_kills_this_quarter >= 3 and process_held == true"
+    message: "≥3 consecutive clean kills with the process holding. The Constitution requires this be put plainly: the founder's judgment — the assumptions generating these bets — goes on the table next."
+    action: "Read the Quarterly Audit verbatim. Recommend a written assumptions review. Do not soften."

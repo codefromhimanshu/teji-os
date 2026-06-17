@@ -10,7 +10,8 @@ description: >
 # Marketing Review
 
 Apply `principles/ai-operating-rules.md`. No campaign runs without a
-measurable hypothesis.
+measurable hypothesis. **You are read-only against Notion.** Output a
+markdown report; the human applies the row to Notion.
 
 ## Marketing rules (enforced)
 
@@ -30,15 +31,58 @@ measurable hypothesis.
    (`~/infinite/principles/experiments/<active>/positioning.md`).
 2. Check: target customer, message clarity, offer strength, positioning fit,
    success metric, stop rule, budget risk.
-3. If it should run, it is an **experiment**: write it with hypothesis,
-   channel, metric, success rule, stop rule, budget, window — into the
-   Experiments DB, not straight to execution.
-4. Anything with spend → Needs Human (permission model: committing money is
-   human-only).
+3. If it should run, it is an **experiment**: spec it with hypothesis,
+   channel, metric, success rule, stop rule, budget, window — the human will
+   create the Experiments DB row from the report block.
+4. Anything with spend → recommend Needs Human (permission model: committing
+   money is human-only).
 
 ## Output
 
-- AI Review (standard format) + Marketing Library entry (Type, Status, Channel,
-  Target Customer, Evidence, AI Notes, Principle Check).
-- If approved-for-test by a human → linked Experiments entry.
-- Slack ping for any Needs Human state. Append to AI Activity Log.
+Write a single markdown file at
+`os/reports/<YYYY-MM-DD>-marketing-review-<slug>.md`:
+
+```
+# Marketing Review — <campaign / idea name>
+
+## Recommended Notion Updates
+Target DB: Marketing Library (id: see os/config/notion-ids.json)
+Row: <existing or "create new">
+- Type: <Positioning | Persona | Hook | Ad Angle | Offer | Landing Copy | ...>
+- Status: <Raw | Testing | Needs Human | Parked>
+  (Approved/Scaled are human-only — never recommend those)
+- Channel: <one>
+- Target Customer: <one line>
+- Evidence: <tagged [Data]/[Estimate]/[Assumption]>
+- Principle Check: <Passed | Failed | Needs Review>
+- AI Notes: <one paragraph>
+
+## AI Review
+(standard format: target customer, hypothesis, metric, success rule, stop
+rule, budget, positioning fit, principle check by number, recommendation,
+confidence, reasoning, what would change my mind.)
+
+## If Approved For Test
+Experiments DB row to copy:
+- Experiment: <title>
+- Status: Planned
+- Hypothesis: <one line>
+- Channel: <one>
+- Metric: <one>
+- Success Rule: <one>
+- Stop Rule: <one>
+- Budget: <number>
+- Start / End Date: <window>
+```
+
+- **Slack**: ping via
+  `os/lib/slack_notify.sh "MARKETING: <name> — <ask> — see os/reports/<file>"`
+  for any Needs Human state or any spend recommendation.
+- **Audit**: append one line to `os/logs/engine.log`:
+  `[ISO timestamp] | marketing-review | wrote <report path> | <verdict>`.
+
+## Hard rules
+
+- Never call any Notion write tool. The report and Slack are the only output
+  channels.
+- Never recommend bypassing the measurable-hypothesis rule.

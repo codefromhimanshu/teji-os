@@ -9,6 +9,14 @@ description: >
 
 # OS Bootstrap
 
+> ⚠️ **EXCEPTION: This is the only skill in the system that writes to
+> Notion.** It runs ONCE, with explicit human invocation, to create the
+> workspace. After bootstrap, the AI is read-only against Notion forever —
+> every other skill outputs markdown reports under `os/reports/` and the
+> human applies them. **If you did not mean to bootstrap, exit now.** Do not
+> run this skill to "fix" or "update" Notion content — that is the human's
+> job from here on.
+
 Creates the Notion workspace this OS runs on. Idempotent: before creating
 anything, check `os/config/notion-ids.json` — if an ID exists and the object
 is alive, verify/patch instead of recreating. Never create duplicates.
@@ -23,7 +31,9 @@ is alive, verify/patch instead of recreating. Never create duplicates.
 ## Create (in order, recording every ID into `os/config/notion-ids.json`)
 
 1. **Company OS** top page with a dashboard section (links added as objects
-   are created) and an **AI Activity Log** child page (append-only).
+   are created) and an **AI Activity Log** child page (append-only — note:
+   after bootstrap this page is no longer written to by the AI; ongoing
+   audit goes to `os/logs/engine.log` instead).
 2. **Company Constitution** page ← full content of
    `principles/company-constitution.md`.
 3. **AI Operating Rules** page ← `principles/ai-operating-rules.md`.
@@ -75,6 +85,8 @@ is alive, verify/patch instead of recreating. Never create duplicates.
 ## Postflight
 
 - Verify each recorded ID resolves; print a checklist of created objects.
-- Append "bootstrap completed" to AI Activity Log.
-- Tell the human: run the Section-26 acceptance test next
-  (`os/tests/acceptance.md`).
+- Append one line to `os/logs/engine.log`:
+  `[ISO timestamp] | os-bootstrap | bootstrap completed | <N objects created>`.
+- Tell the human: from this point on the AI is read-only against Notion;
+  every other skill writes markdown reports under `os/reports/`. Run the
+  Section-26 acceptance test next (`os/tests/acceptance.md`).

@@ -1,0 +1,1 @@
+Read-only local snapshot of Notion. Refreshed by `os/skills/os-sync/`. The engine queries these mirrors instead of hammering the Notion API on every check. Do NOT hand-edit; changes here are overwritten on next sync.
